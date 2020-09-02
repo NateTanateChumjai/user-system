@@ -1,5 +1,5 @@
 <template>
-    <form v-if="!loading" class="form" v-on:submit="onSubmit">
+    <form v-if="!loading" class="form" @submit.prevent="onSubmit">
         <div class="input-fieId">
             <label for="title">Title</label>
             <input type="text"
@@ -16,25 +16,70 @@
                 v-model="body"
                 class="validate"
             >
-            <span class="helper-text" data-error="Title must not be empty"></span>
+            <span class="helper-text" data-error="Body must not be empty"></span>
         </div>
         <button type="submit" class="waves-effect waves-light btn">Add</button>
     </form>
+    <div class="progress" v-else-if="loading">
+      <div class="indeterminate"></div>
+  </div>
 </template>
 
 <script>
+import PostService from '../PostService';
+const postService = new PostService();
 export default {
     name: "PostForm",
     data(){
         return{
             loading: false,
             title: "",
-            body: ""
+            body: "",
+            errors: {}
         };
+    },
+    methods:{
+        onSubmit(){
+            if(!this.validForm()){
+                this.loading = false;
+                return;
+            }
+            this.loading = true;
+            const post = {
+                title: this.title,
+                body: this.body
+            };
+
+            postService.writePost(post)
+            .then(res => {
+                this.loading = false;
+                this.body = "";
+                this.title = "";
+                console.log(res.data);
+            })
+            .catch(err => console.error(err));   
+        },
+        validForm(){
+            this.errors = {};
+            if(this.title.trim() === ""){
+                this.errors.title = 'Title';
+            }
+            if(this.body.trim() === ""){
+                this.errors.body = 'Body';
+            }
+            if(Object.keys(this.errors).length > 0){
+                return false;
+            }else return true;
+        }
     }
-}
+};
 </script>
 
-<style  scoped>
-
+<style>
+    .form{
+        margin: 50px;
+    }
+    .progress{
+        margin: 100px;
+    }
 </style>
