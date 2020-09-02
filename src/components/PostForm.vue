@@ -5,7 +5,7 @@
             <input type="text"
                 name="title"
                 v-model="title"
-                class="validate"
+                :class="[errors.title ? 'invalid' : 'validate']"
             >
             <span class="helper-text" data-error="Title must not be empty"></span>
         </div>
@@ -14,7 +14,7 @@
             <input type="text"
                 name="body"
                 v-model="body"
-                class="validate"
+                 :class="[errors.body ? 'invalid' : 'validate']"
             >
             <span class="helper-text" data-error="Body must not be empty"></span>
         </div>
@@ -50,12 +50,13 @@ export default {
                 body: this.body
             };
 
-            postService.writePost(post)
+            postService
+            .writePost(post)
             .then(res => {
                 this.loading = false;
                 this.body = "";
                 this.title = "";
-                console.log(res.data);
+                this.$emit('postCreated', res.data);
             })
             .catch(err => console.error(err));   
         },

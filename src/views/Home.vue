@@ -2,7 +2,7 @@
 <div>
     <div class="row">
         <div class="col s6">
-            <PostForm/>
+            <PostForm @postCreated="addPost"/>
         </div>
     </div>
     <div class="row">
@@ -22,8 +22,8 @@
                     <p> {{post.body }} </p>
                 </div>
                 <div class="card-action">
-                    <a href="#">Edit</a>
-                    <a href="#" class="delete-btn">Delete</a>
+                    <a href="#" @click="editPost(post)">Edit</a>
+                    <a href="#" class="delete-btn" @click="daletePost(post.id)">Delete</a>
                 </div>
             </div>
         </div>
@@ -48,6 +48,21 @@ export default {
        return {
            posts: []
        }
+    },
+    methods:{
+        addPost(post){
+            this.posts.unshift(post);
+        },
+        editPost(post){
+            console.log(post);
+        },
+        daletePost(id){
+            postService.deletePost(id)
+            .then(() => { 
+               this.posts = this.posts.filter(p => p.id !== id);
+            })
+            .catch(err => console.error(err)); 
+        }
     },
     created(){
         postService.getAllPost()
